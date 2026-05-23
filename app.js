@@ -1,11 +1,12 @@
 const express = require("express");
 
-const foodRoutes = require('./routes/foodRoutes');
+const foodRoutes = require("./routes/foodRoutes");
 const userRoutes = require("./routes/userRoutes");
 
 const app = express();
 
 //MIDDLEWARE
+app.use(express.json());
 
 module.exports = app;
 

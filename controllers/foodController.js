@@ -4,6 +4,26 @@ const food_data = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/food.json`, "utf-8"),
 );
 
+exports.checkID = (req, res, val, next) => {
+  if (req.params.id * 1 > food_data.length) {
+    return res.status(404).json({
+      status: "fail",
+      message: "Invalid ID",
+    });
+  }
+  next();
+};
+
+exports.checkBody = (req, res, next) => {
+  if (!req.body.name || !req.body.price) {
+    return res.status(404).json({
+      status: "fail",
+      message: "missing name or price",
+    });
+  }
+  next();
+};
+
 exports.getAllFood = (req, res) => {
   res.status(200).json({
     status: "success",
@@ -47,7 +67,7 @@ exports.createFood = (req, res) => {
   );
 };
 
-exports.updateTour = (req, res) => {
+exports.updateFood = (req, res) => {
   res.status(200).json({
     status: "success",
     data: {
@@ -56,7 +76,7 @@ exports.updateTour = (req, res) => {
   });
 };
 
-exports.deleteTour = (req, res) => {
+exports.deleteFood = (req, res) => {
   res.status(200).json({
     status: "success",
     data: null,

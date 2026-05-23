@@ -138,5 +138,20 @@
     "price": 16,
     "calories_per_serving_min": 550,
     "calories_per_serving_max": 950
+  },
+  {
+    "id": 11,
+    "name": "Chicken Katsu Curry",
+    "search": "katsu curry",
+    "description": "Japanese crispy chicken cutlet served with rice and rich savory curry sauce.",
+    "search_in": "both",
+    "ingredients": "chicken,rice,curry sauce",
+    "cuisine": "japanese",
+    "meal_type": "main",
+    "difficulty": "medium",
+    "dietary_tags": "gluten_free",
+    "price": 14,
+    "calories_per_serving_min": 600,
+    "calories_per_serving_max": 950
   }
 ]
