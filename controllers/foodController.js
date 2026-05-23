@@ -4,7 +4,7 @@ const food_data = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/food.json`, "utf-8"),
 );
 
-exports.checkID = (req, res, val, next) => {
+exports.checkID = (req, res, next, val) => {
   if (req.params.id * 1 > food_data.length) {
     return res.status(404).json({
       status: "fail",
