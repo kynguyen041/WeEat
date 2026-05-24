@@ -13,8 +13,13 @@ if (process.env.NODE_ENV == "development") {
 
 app.use(express.json());
 
-module.exports = app;
+app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString();
+  next();
+});
 
 //ROUTES
 app.use("/api/v1/food", foodRoutes);
-// app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/user", userRoutes);
+
+module.exports = app;
