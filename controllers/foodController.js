@@ -1,18 +1,5 @@
 const fs = require("fs");
-
-const food_data = JSON.parse(
-  fs.readFileSync(`${__dirname}/../dev-data/data/food.json`, "utf-8"),
-);
-
-exports.checkID = (req, res, next, val) => {
-  if (req.params.id * 1 > food_data.length) {
-    return res.status(404).json({
-      status: "fail",
-      message: "Invalid ID",
-    });
-  }
-  next();
-};
+const Food = require("./../model/foodModel");
 
 exports.checkBody = (req, res, next) => {
   if (!req.body.name || !req.body.price) {
@@ -24,61 +11,90 @@ exports.checkBody = (req, res, next) => {
   next();
 };
 
-exports.getAllFood = (req, res) => {
-  res.status(200).json({
-    status: "success",
-    requestedAt: req.requestTime,
-    results: food_data.length,
-    data: {
-      food_data,
-    },
-  });
+exports.getAllFood = async (req, res) => {
+  try {
+    const food_data = await Food.find();
+    res.status(200).json({
+      status: "success",
+      requestedAt: req.requestTime,
+      results: food_data.length,
+      data: {
+        food_data,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: "fail",
+      message: err,
+    });
+  }
 };
 
-exports.getFood = (req, res) => {
-  const id = req.params.id * 1;
-  const food = food_data.find((el) => el.id === id);
-
-  res.status(200).json({
-    status: "success",
-    data: {
-      food,
-    },
-  });
+exports.getFood = async (req, res) => {
+  try {
+    const food = await Food.findById(req.params.id);
+    res.status(200).json({
+      status: "success",
+      data: {
+        food,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: "fail",
+      message: err,
+    });
+  }
 };
 
-exports.createFood = (req, res) => {
-  const newId = food_data[food_data.length - 1].id + 1;
-  const newFood = Object.assign({ id: newId }, req.body);
-
-  food_data.push(newFood);
-
-  fs.writeFile(
-    `${__dirname}/../dev-data/data/food.json`,
-    JSON.stringify(food_data),
-    (err) => {
-      res.status(200).json({
-        status: "success",
-        data: {
-          food: newFood,
-        },
-      });
-    },
-  );
+exports.createFood = async (req, res) => {
+  const newFood = await Food.create(req.body);
+  try {
+    res.status(200).json({
+      status: "success",
+      data: {
+        newFood,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: "fail",
+      message: "Invalid data sent",
+    });
+  }
 };
 
-exports.updateFood = (req, res) => {
-  res.status(200).json({
-    status: "success",
-    data: {
-      tour: "<Updated tour here...>",
-    },
-  });
+exports.updateFood = async (req, res) => {
+  try {
+    const food = await Food.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    res.status(200).json({
+      status: "success",
+      data: {
+        food,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: "fail",
+      message: message,
+    });
+  }
 };
 
-exports.deleteFood = (req, res) => {
-  res.status(200).json({
-    status: "success",
-    data: null,
-  });
+exports.deleteFood = async (req, res) => {
+  try {
+    await Food.findByIdAndDelete(req.params.id);
+    res.status(204).json({
+      status: "success",
+      data: null,
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: "fail",
+      message: message,
+    });
+  }
 };

@@ -3,7 +3,6 @@ const foodController = require("../controllers/foodController");
 
 const router = express.Router();
 
-router.param("id", foodController.checkID);
 
 router
   .route("/")
