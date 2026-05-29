@@ -18,6 +18,8 @@ app.use((req, res, next) => {
   next();
 });
 
+app.set("query parser", "extended");
+
 //ROUTES
 app.use("/api/v1/food", foodRoutes);
 app.use("/api/v1/user", userRoutes);
