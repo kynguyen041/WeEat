@@ -1,0 +1,30 @@
+{
+  "name": "Spicy Chicken Ramen",
+  "slug": "spicy-chicken-ramen",
+  "description": "Rich and flavorful Japanese ramen with grilled chicken, soft-boiled egg, mushrooms, and spicy broth.",
+  "cuisine": "japanese",
+  "category": "noodles",
+  "imageCover": "spicy-chicken-ramen-cover.jpg",
+  "images": ["spicy-chicken-ramen-1.jpg", "spicy-chicken-ramen-2.jpg"],
+  "price": 18,
+  "discountPrice": 15,
+  "ingredients": [
+    "ramen noodles",
+    "chicken",
+    "egg",
+    "mushrooms",
+    "green onions",
+    "spicy broth"
+  ],
+  "allergens": ["egg", "soy"],
+  "dietaryTags": ["dairy_free"],
+  "spiceLevel": 3,
+  "calories": 820,
+  "preparationTime": 25,
+  "available": true,
+  "ratingsAverage": 4.8,
+  "ratingsQuantity": 145,
+  "numReviews": 120,
+  "totalOrders": 980,
+  "featured": true
+}

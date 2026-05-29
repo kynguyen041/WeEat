@@ -13,7 +13,15 @@ exports.checkBody = (req, res, next) => {
 
 exports.getAllFood = async (req, res) => {
   try {
-    const food_data = await Food.find();
+    //BUILD QUERY
+    const queryObj = { ...req.query };
+    const excludedFields = ["page", "sort", "limit", "field"];
+    excludedFields.forEach((field) => delete queryObj[field]);
+
+    const query = Food.find(queryObj);
+    
+    const food_data = await query;
+
     res.status(200).json({
       status: "success",
       requestedAt: req.requestTime,
