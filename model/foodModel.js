@@ -155,6 +155,7 @@ const foodSchema = new mongoose.Schema({
   },
 });
 
+
 const Food = mongoose.model("Food", foodSchema);
 
 module.exports = Food;

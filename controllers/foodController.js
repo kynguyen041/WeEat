@@ -1,6 +1,14 @@
 const fs = require("fs");
 const Food = require("./../model/foodModel");
 
+//bug
+exports.aliasTopFood = (req, res, next) => {
+  req.query.limit = "5";
+  req.query.sort = "-ratingsAverage,price";
+  req.query.fields = "name,price,ratingsAverage,description,cuisine";
+  next();
+};
+
 exports.checkBody = (req, res, next) => {
   if (!req.body.name || !req.body.price) {
     return res.status(404).json({
@@ -29,7 +37,27 @@ exports.getAllFood = async (req, res) => {
       const sortBy = req.query.sort.split(",").join(" ");
       query = query.sort(sortBy);
     } else {
-      query = query.sort("-updatedAt");
+      query = query.sort("-createdAt");
+    }
+
+    //3 Limiting Fields
+    if (req.query.fields) {
+      const fields = req.query.fields.split(",").join(" ");
+      query = query.select(fields);
+    } else {
+      query = query.select("-__v");
+    }
+    //4 Pagination
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 100;
+    const skip = (page - 1) * limit;
+
+    query = query.skip(skip).limit(limit);
+    if (req.query.page) {
+      const numFood = await Food.countDocuments();
+      if (skip >= numFood) {
+        throw new Error("This page does not exist");
+      }
     }
 
     const food_data = await query;
@@ -45,7 +73,7 @@ exports.getAllFood = async (req, res) => {
   } catch (err) {
     res.status(404).json({
       status: "fail",
-      message: err,
+      message: err.message,
     });
   }
 };

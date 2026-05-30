@@ -3,6 +3,10 @@ const foodController = require("../controllers/foodController");
 
 const router = express.Router();
 
+//bug: aliasTopFood
+router
+  .route("/top-5-food")
+  .get(foodController.aliasTopFood, foodController.getAllFood);
 
 router
   .route("/")
