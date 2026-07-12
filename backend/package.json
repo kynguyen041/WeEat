@@ -1,0 +1,44 @@
+{
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^4.22.2",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^8.5.2",
+    "helmet": "^8.2.0",
+    "hpp": "^0.2.3",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^6.13.9",
+    "morgan": "^1.10.1",
+    "nodemailer": "^8.0.11",
+    "slugify": "^1.6.9",
+    "xss-clean": "^0.1.4"
+  },
+  "name": "weeat",
+  "version": "1.0.0",
+  "description": "first mobile app",
+  "main": "app.js",
+  "scripts": {
+    "start:dev": "set NODE_ENV=development&& nodemon server.js",
+    "start:prod": "set NODE_ENV=production&& nodemon server.js",
+    "debug": "ndb server.js"
+  },
+  "keywords": [
+    "firstproject"
+  ],
+  "author": "Ky Nguyen",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^5.5.5",
+    "eslint-plugin-react": "^7.37.5",
+    "nodemon": "^3.1.14",
+    "prettier": "^3.8.3"
+  }
+}
