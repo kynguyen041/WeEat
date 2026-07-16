@@ -92,24 +92,39 @@ exports.searchFood = catchAsync(async (req, res, next) => {
 
   const merchantIds = merchants.map((merchant) => merchant._id);
 
+  // const start = performance.now();
+  // const food_data = await Food.find({
+  //   $or: [
+  //     {
+  //       name: {
+  //         $regex: keyword,
+  //         $options: "i",
+  //       },
+  //     },
+  //     {
+  //       category: {
+  //         $regex: keyword,
+  //         $options: "i",
+  //       },
+  //     },
+  //     {
+  //       cuisine: {
+  //         $regex: keyword,
+  //         $options: "i",
+  //       },
+  //     },
+  //     {
+  //       merchant: {
+  //         $in: merchantIds,
+  //       },
+  //     },
+  //   ],
+  // }).populate("merchant");
   const food_data = await Food.find({
     $or: [
       {
-        name: {
-          $regex: keyword,
-          $options: "i",
-        },
-      },
-      {
-        category: {
-          $regex: keyword,
-          $options: "i",
-        },
-      },
-      {
-        cuisine: {
-          $regex: keyword,
-          $options: "i",
+        $text: {
+          $search: keyword,
         },
       },
       {
@@ -118,8 +133,10 @@ exports.searchFood = catchAsync(async (req, res, next) => {
         },
       },
     ],
-  }).populate("merchant");
+  });
+  // const end = performance.now();
 
+  // console.log(`Search query took ${end - start} ms`);
   res.status(200).json({
     status: "success",
     results: food_data.length,

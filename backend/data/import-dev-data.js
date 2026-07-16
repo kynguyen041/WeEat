@@ -5,7 +5,9 @@ const Food = require("./../model/foodModel");
 const Review = require("./../model/reviewModel");
 const User = require("./../model/userModel");
 
-dotenv.config({ path: "./config.env" });
+// dotenv.config({ path: "./config.env" });
+
+dotenv.config({ path: `${__dirname}/../config.env` });
 
 const DB = process.env.DATABASE.replace(
   "<PASSWORD>",

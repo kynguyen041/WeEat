@@ -1,9 +1,9 @@
 import { View, Text } from "react-native";
 
-export default function SettingsScreen() {
+export default function CartScreen() {
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Coming soon</Text>
+      <Text>Cart coming soon</Text>
     </View>
   );
 }

@@ -1,0 +1,23 @@
+[
+  {
+    "_id": "d444a157d52ed8748d31d309",
+    "review": "Juicy chicken and great sauce, highly recommend.",
+    "rating": 5,
+    "food": "bef2c328a72c5e5b77518b10",
+    "user": "3f57fd14c1604d115cea325a"
+  },
+  {
+    "_id": "954d2c93e7fb6d28c587db82",
+    "review": "One of the best chicken dishes I've had here.",
+    "rating": 5,
+    "food": "bef2c328a72c5e5b77518b10",
+    "user": "19731662b5e803b61ba41681"
+  },
+  {
+    "_id": "f6a0efa5ea7d26dc47bbcfb4",
+    "review": "Great flavor but arrived a bit cold.",
+    "rating": 4,
+    "food": "bef2c328a72c5e5b77518b10",
+    "user": "e574de739988b886e7577496"
+  }
+]

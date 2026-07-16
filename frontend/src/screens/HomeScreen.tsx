@@ -74,17 +74,6 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header */}
-        {/* <View style={styles.header}>
-          <Text style={styles.greeting}>👋 Hello, Ky</Text>
-
-          <Text style={styles.location}>Deliver to {locationName}</Text>
-        </View>
-        <TouchableOpacity onPress={() => router.push("/search")}>
-          <View style={styles.searchInput}>
-            <Text style={{ color: "#999" }}>Search food...</Text>
-          </View>
-        </TouchableOpacity> */}
-
         <View style={styles.header}>
           <View style={styles.headerRow}>
             {/* Menu */}

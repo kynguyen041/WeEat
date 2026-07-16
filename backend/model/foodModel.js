@@ -191,6 +191,17 @@ foodSchema.index({ price: 1, ratingsAverage: 1 });
 foodSchema.index({ slug: 1 });
 foodSchema.index({ restaurantLocation: "2dsphere" });
 
+// text
+foodSchema.index({
+  name: "text",
+  description: "text",
+  cuisine: "text",
+  category: "text",
+  ingredients: "text",
+});
+
+foodSchema.index({ merchant: 1 });
+
 foodSchema.virtual("priceAfterTax").get(function () {
   return this.price * 1.2;
 });
