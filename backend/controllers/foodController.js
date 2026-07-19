@@ -1,3 +1,4 @@
+const crypto = require("crypto");
 const fs = require("fs");
 const Food = require("./../model/foodModel");
 const User = require("../model/userModel");
@@ -5,6 +6,8 @@ const APIFeature = require("./../utils/apiFeature");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/AppError");
 const factory = require("../controllers/handlerFactory");
+const imageProcessor = require("../utils/imageProcessor");
+const geminiService = require("../utils/geminiService");
 
 exports.aliasTopFood = (req, res, next) => {
   req.aliasQuery = {
@@ -246,5 +249,30 @@ exports.getDistances = catchAsync(async (req, res, next) => {
     data: {
       data: distances,
     },
+  });
+});
+
+// --- Analyze Food Image (AI) ---
+exports.analyzeFoodImage = catchAsync(async (req, res, next) => {
+  // 1. Validate uploaded image
+  const image = await imageProcessor.validateImage(req.file);
+
+  // 2. Send to Gemini AI
+  const raw = await geminiService.analyze({
+    buffer: req.file.buffer,
+    format: image.format,
+  });
+
+  // 3. Parse and normalize AI response
+  const foodMetadata = geminiService.parseAndValidate(raw);
+
+  // 4. Build response
+  const analysisId = crypto.randomUUID();
+  const responseData = { foodMetadata, analysisId };
+  if (foodMetadata.confidence < 0.4) responseData.lowConfidence = true;
+
+  res.status(200).json({
+    status: "success",
+    data: responseData,
   });
 });

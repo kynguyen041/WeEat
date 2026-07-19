@@ -3,10 +3,23 @@ const foodController = require("../controllers/foodController");
 const authController = require("../controllers/authController");
 const reviewController = require("../controllers/reviewController");
 const reviewRouter = require("../routes/reviewRoutes");
+const analyzeImageRateLimiter = require("../utils/analyzeImageRateLimiter");
+const { uploadFoodImage } = require("../utils/uploadFoodImage");
 const router = express.Router();
 
 router.route("/search").get(foodController.searchFood);
 router.use("/:foodId/reviews", reviewRouter);
+
+// AI image analysis endpoint
+router
+  .route("/analyze-image")
+  .post(
+    authController.protect,
+    authController.restrictTo("admin", "merchant"),
+    analyzeImageRateLimiter,
+    uploadFoodImage,
+    foodController.analyzeFoodImage,
+  );
 
 router
   .route("/top-5-food")

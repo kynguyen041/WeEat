@@ -1,4 +1,18 @@
+const multer = require("multer");
 const AppError = require("../utils/AppError");
+
+const handleMulterError = (err) => {
+  if (err.code === "LIMIT_FILE_SIZE") {
+    return new AppError(
+      "Image exceeds the maximum allowed size of 10 MB.",
+      400,
+    );
+  }
+  return new AppError(
+    "Unsupported format. Accepted formats: JPEG, PNG, WebP.",
+    400,
+  );
+};
 
 const handleCastErrorDB = (err) => {
   const message = `Invalid ${err.path} : ${err.value}`;
@@ -54,6 +68,16 @@ const sendErrorProd = (err, req, res) => {
 module.exports = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || "error";
+
+  // Handle multer errors in both environments
+  if (err instanceof multer.MulterError) {
+    const multerErr = handleMulterError(err);
+    return res.status(multerErr.statusCode).json({
+      status: multerErr.status,
+      message: multerErr.message,
+    });
+  }
+
   if (process.env.NODE_ENV === "development") {
     sendErrorDev(err, req, res);
   } else if (process.env.NODE_ENV === "production") {
