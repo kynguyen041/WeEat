@@ -60,6 +60,21 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
   },
+
+  screen: {
+    flex: 1,
+  },
+
+  backButton: {
+    position: "absolute",
+    top: 50,
+    left: 20,
+    zIndex: 10,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 8,
+    elevation: 3,
+  },
 });
 
 export default styles;

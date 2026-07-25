@@ -34,7 +34,7 @@ export default function SearchScreen() {
         setLoading(false);
       }
       return () => clearTimeout(timeout);
-    }, 300);
+    }, 500);
   }, [search]);
 
   return (
