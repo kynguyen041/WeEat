@@ -79,4 +79,9 @@ export default StyleSheet.create({
     fontWeight: "700",
     color: "#FF6B35",
   },
+  backButton: {
+    marginTop: 10,
+    marginLeft: 16,
+    marginBottom: 8,
+  },
 });

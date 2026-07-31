@@ -7,6 +7,7 @@ import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { getFoodWithin } from "../api/foodAPI";
 import styles from "../styles/HomeScreen.styles";
+import { useAuth } from "../context/AuthContext";
 
 const categories = ["Burger", "Pizza", "Noodles", "Salad", "Dessert", "Drink"];
 
@@ -14,6 +15,7 @@ export default function HomeScreen() {
   const [foods, setFoods] = useState<Food[]>([]);
   const [loading, setLoading] = useState(true);
   const [locationName, setLocationName] = useState("Getting location...");
+  const { token } = useAuth();
 
   useEffect(() => {
     async function loadNearbyFoods() {
@@ -62,6 +64,14 @@ export default function HomeScreen() {
     loadNearbyFoods();
   }, []);
 
+  function handleProfilePress() {
+    if (token) {
+      router.push("/profile");
+    } else {
+      router.push("/login");
+    }
+  }
+
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
@@ -75,28 +85,23 @@ export default function HomeScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <View style={styles.headerRow}>
+          <View style={styles.flex}>
             {/* Menu */}
             <TouchableOpacity onPress={() => router.push("/settings")}>
               <Ionicons name="menu" size={30} color="#222" />
             </TouchableOpacity>
 
             {/* Delivery location */}
-            <TouchableOpacity
-              style={styles.locationContainer}
-              onPress={() => router.push("/addresses")}
-            >
+            <View style={styles.locationContainer}>
               <Ionicons name="location" size={18} color="#FF6B35" />
 
               <Text style={styles.locationText} numberOfLines={1}>
                 {locationName}
               </Text>
-
-              <Ionicons name="chevron-down" size={16} color="#555" />
-            </TouchableOpacity>
+            </View>
 
             {/* Profile */}
-            <TouchableOpacity onPress={() => router.push("/profile")}>
+            <TouchableOpacity onPress={handleProfilePress}>
               <Ionicons name="person-circle" size={38} color="#FF6B35" />
             </TouchableOpacity>
           </View>

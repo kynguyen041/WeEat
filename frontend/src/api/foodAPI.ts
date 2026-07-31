@@ -1,6 +1,6 @@
 import { BASE_URL } from "./config";
 import { Food } from "./types";
-
+import { User } from "../api/types";
 export async function getAllFood(): Promise<Food[]> {
   const response = await fetch(`${BASE_URL}/food`);
 
@@ -57,3 +57,5 @@ export async function searchFood(keyword: string): Promise<Food[]> {
 
   return json.data.data;
 }
+
+

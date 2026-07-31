@@ -7,8 +7,14 @@ const styles = StyleSheet.create({
   },
 
   header: {
-    backgroundColor: "#FFFFFF",
-    padding: 20,
+    height: 70,
+  },
+
+  flex: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
 
   greeting: {
@@ -116,23 +122,18 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
   },
-  header: {
-    backgroundColor: "#FFF",
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-  },
 
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    // justifyContent: "space-between",
   },
 
   locationContainer: {
     flex: 1,
     flexDirection: "row",
-    alignItems: "center",
-    marginHorizontal: 15,
+    // alignItems: "center",
+    // marginHorizontal: 15,
   },
 
   locationText: {
