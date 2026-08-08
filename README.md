@@ -11,6 +11,9 @@ A full-stack food delivery mobile application that connects customers with nearb
 | Database | MongoDB (Mongoose v6) |
 | Auth | JWT + bcrypt |
 | Location | expo-location, MongoDB GeoJSON ($geoWithin, $geoNear) |
+| AI | Google Gemini (`@google/generative-ai`) for food image recognition |
+| File Upload | Multer (in-memory), Sharp (image validation) |
+| Testing | Jest |
 
 ## Features
 
@@ -22,6 +25,7 @@ A full-stack food delivery mobile application that connects customers with nearb
 - **Food catalog** — Filtering, sorting, pagination, stats aggregation
 - **Categories** — Burger, Pizza, Noodles, Salad, Dessert, Drink, Chicken, Rice Bowl, Soup
 - **Cuisines** — Japanese, Korean, Thai, Vietnamese, Chinese, Italian, American, Indian, Mexican
+- **AI food image analysis** — Merchants/admins upload a food photo and get back AI-extracted metadata (name, description, ingredients, allergens, dietary tags, cuisine, category, calories, spice level, confidence) via Google Gemini
 - **Security** — Helmet, rate limiting, NoSQL injection sanitization, XSS protection, HPP
 
 ## Project Structure
@@ -31,27 +35,36 @@ WeEat/
 ├── backend/
 │   ├── server.js                  # Entry point — connects MongoDB, starts Express server
 │   ├── app.js                     # Express app config, middleware stack, route mounting
-│   ├── config.env                 # Environment variables (not committed)
+│   ├── .env                       # Environment variables (not committed)
 │   ├── controllers/
 │   │   ├── authController.js      # Signup, login, protect, password reset
-│   │   ├── foodController.js      # Food CRUD, search, geospatial, stats
+│   │   ├── foodController.js      # Food CRUD, search, geospatial, stats, AI image analysis
 │   │   ├── userController.js      # User profile, updateMe, deleteMe
 │   │   ├── reviewController.js    # Review CRUD
 │   │   ├── handlerFactory.js      # Generic CRUD factory functions
-│   │   └── errorController.js     # Global error handler
+│   │   └── errorController.js     # Global error handler (incl. Multer error normalization)
 │   ├── model/
 │   │   ├── foodModel.js           # Food schema (GeoJSON, text index, virtuals)
 │   │   ├── userModel.js           # User schema (roles, addresses, password hashing)
 │   │   └── reviewModel.js         # Review schema (auto rating calculation)
 │   ├── routes/
-│   │   ├── foodRoutes.js          # /api/v1/food endpoints
+│   │   ├── foodRoutes.js          # /api/v1/food endpoints (incl. /analyze-image)
 │   │   ├── userRoutes.js          # /api/v1/user endpoints
 │   │   └── reviewRoutes.js        # /api/v1/reviews endpoints
 │   ├── utils/
-│   │   ├── apiFeature.js          # Query filtering, sorting, pagination
-│   │   ├── AppError.js            # Custom error class
-│   │   ├── catchAsync.js          # Async error wrapper
-│   │   └── email.js               # Nodemailer utility
+│   │   ├── apiFeature.js               # Query filtering, sorting, pagination
+│   │   ├── AppError.js                 # Custom error class
+│   │   ├── catchAsync.js               # Async error wrapper
+│   │   ├── email.js                    # Nodemailer utility
+│   │   ├── geminiService.js            # Gemini AI client — image analysis + response normalization
+│   │   ├── imageProcessor.js           # Image validation (format, size, dimensions)
+│   │   ├── uploadFoodImage.js          # Multer config for in-memory image upload
+│   │   └── analyzeImageRateLimiter.js  # Per-user rate limiter for the AI endpoint
+│   ├── docs/
+│   │   └── analyze-image.swagger.yaml  # OpenAPI spec for the AI image analysis endpoint
+│   ├── tests/
+│   │   ├── imageProcessor.test.js      # Unit tests for image validation
+│   │   └── geminiService.test.js       # Unit tests for AI response parsing/normalization
 │   ├── data/
 │   │   ├── food.json              # Seed data for food
 │   │   ├── users.json             # Seed data for users
@@ -63,6 +76,7 @@ WeEat/
 │   ├── src/
 │   │   ├── app/                   # Expo Router file-based routing
 │   │   │   ├── _layout.tsx        # Root Stack navigator
+│   │   │   ├── analyze-image.tsx  # AI food image analysis route
 │   │   │   ├── (tabs)/
 │   │   │   │   ├── _layout.tsx    # Tab navigator (Home, Cart, Activity, Messages)
 │   │   │   │   ├── index.tsx      # Home tab
@@ -73,23 +87,27 @@ WeEat/
 │   │   │   │   └── [id].tsx       # Dynamic food detail route
 │   │   │   └── search.tsx         # Search page
 │   │   ├── screens/
-│   │   │   ├── HomeScreen.tsx     # Nearby food, categories, location header
-│   │   │   ├── FoodDetailScreen.tsx # Food image, description, add to cart
-│   │   │   ├── CartScreen.tsx     # Cart (placeholder)
-│   │   │   ├── ActivityScreen.tsx # Order activity
-│   │   │   ├── MessageScreen.tsx  # Messages
-│   │   │   ├── ProfileScreen.tsx  # User profile
-│   │   │   └── SettingsScreen.tsx # App settings
+│   │   │   ├── HomeScreen.tsx               # Nearby food, categories, location header
+│   │   │   ├── FoodDetailScreen.tsx          # Food image, description, add to cart
+│   │   │   ├── AnalyzeFoodImageScreen.tsx    # AI image capture + analysis results
+│   │   │   ├── CartScreen.tsx               # Cart
+│   │   │   ├── ActivityScreen.tsx           # Order activity
+│   │   │   ├── MessageScreen.tsx            # Messages
+│   │   │   ├── ProfileScreen.tsx            # User profile
+│   │   │   └── SettingsScreen.tsx           # App settings
 │   │   ├── api/
 │   │   │   ├── config.ts          # API base URL
-│   │   │   ├── foodAPI.ts         # Food API calls (getAll, getWithin, search, getOne)
-│   │   │   └── types.ts           # TypeScript interfaces (Food, User, Review)
-│   │   └── styles/
-│   │       ├── HomeScreen.styles.ts
-│   │       ├── FoodDetailScreen.styles.ts
-│   │       └── SearchScreen.styles.ts
+│   │   │   ├── foodAPI.ts         # Food API calls + analyzeFoodImage upload
+│   │   │   └── types.ts           # TypeScript interfaces (Food, User, Review, FoodMetadata, AnalyzeImageResult)
+│   │   ├── styles/
+│   │   │   ├── HomeScreen.styles.ts
+│   │   │   ├── FoodDetailScreen.styles.ts
+│   │   │   ├── SearchScreen.styles.ts
+│   │   │   └── AnalyzeFoodImageScreen.styles.ts
+│   │   └── utils/
+│   │       └── imagePicker.ts     # Camera/library permission requests + picker helpers
 │   ├── assets/                    # Images, icons, splash screen
-│   ├── app.json                   # Expo configuration
+│   ├── app.json                   # Expo config (permissions, plugins)
 │   └── package.json
 │
 └── README.md
@@ -111,6 +129,7 @@ WeEat/
 | GET | `/api/v1/food/top-5-food` | Top 5 rated food | Public |
 | GET | `/api/v1/food/food-stats` | Cuisine stats | Public |
 | GET | `/api/v1/food/allergen-stats` | Allergen stats | Public |
+| POST | `/api/v1/food/analyze-image` | AI food image analysis (auto-extract metadata) | Merchant/Admin |
 
 ### Users
 | Method | Endpoint | Description | Auth |
@@ -146,7 +165,7 @@ cd backend
 npm install
 ```
 
-Create a `config.env` file:
+Create a `.env` file:
 
 ```env
 NODE_ENV=development
@@ -160,7 +179,10 @@ EMAIL_USERNAME=your_mailtrap_username
 EMAIL_PASSWORD=your_mailtrap_password
 EMAIL_HOST=smtp.mailtrap.io
 EMAIL_PORT=2525
+GEMINI_API_KEY=your_google_gemini_api_key
 ```
+
+> `GEMINI_API_KEY` is required for the AI food image analysis endpoint (`/api/v1/food/analyze-image`). Get one from [Google AI Studio](https://aistudio.google.com/app/apikey).
 
 Seed the database (optional):
 
@@ -174,12 +196,22 @@ Start the server:
 npm run start:dev
 ```
 
+Run the backend test suite:
+
+```bash
+npm test
+```
+
+The AI image analysis endpoint's full request/response contract is documented in [`backend/docs/analyze-image.swagger.yaml`](./backend/docs/analyze-image.swagger.yaml).
+
 ### Frontend Setup
 
 ```bash
 cd frontend
 npm install
 ```
+
+> The project runs on **Expo SDK 57 / React Native 0.86**. If you previously had an older `node_modules`, delete it and run `npm install` fresh to avoid Metro bundler errors.
 
 Update the API base URL in `src/api/config.ts` to match your backend:
 
