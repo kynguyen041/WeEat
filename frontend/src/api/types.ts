@@ -158,3 +158,46 @@ export interface Food {
   updatedAt: string;
 }
 
+// ====================
+// AI Food Image Analysis
+// ====================
+
+export interface FoodMetadata {
+  name: string;
+
+  description: string;
+
+  ingredients: string[];
+
+  allergens: string[];
+
+  dietaryTags: (
+    | "vegan"
+    | "vegetarian"
+    | "halal"
+    | "gluten_free"
+    | "dairy_free"
+    | "nut_free"
+  )[];
+
+  cuisine: Food["cuisine"];
+
+  category: Food["category"];
+
+  calories: number;
+
+  spiceLevel: number;
+
+  /** AI confidence score, 0.0 - 1.0 */
+  confidence: number;
+}
+
+export interface AnalyzeImageResult {
+  foodMetadata: FoodMetadata;
+
+  /** Tracking identifier for this analysis */
+  analysisId: string;
+
+  /** Present and true only when confidence < 0.4 */
+  lowConfidence?: boolean;
+}

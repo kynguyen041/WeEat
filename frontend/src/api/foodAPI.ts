@@ -1,6 +1,6 @@
 import { BASE_URL } from "./config";
-import { Food } from "./types";
-import { User } from "../api/types";
+import { AnalyzeImageResult, Food } from "./types";
+
 export async function getAllFood(): Promise<Food[]> {
   const response = await fetch(`${BASE_URL}/food`);
 
@@ -58,4 +58,37 @@ export async function searchFood(keyword: string): Promise<Food[]> {
   return json.data.data;
 }
 
+/**
+ * Uploads a food image to the AI analysis endpoint.
+ * Requires a merchant/admin JWT.
+ */
+export async function analyzeFoodImage(
+  image: { uri: string; mimeType: string; fileName: string },
+  token: string,
+): Promise<AnalyzeImageResult> {
+  const formData = new FormData();
 
+  // React Native's FormData accepts this file descriptor shape.
+  formData.append("image", {
+    uri: image.uri,
+    type: image.mimeType,
+    name: image.fileName,
+  } as unknown as Blob);
+
+  const response = await fetch(`${BASE_URL}/food/analyze-image`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      // Content-Type is intentionally omitted so RN sets the multipart boundary.
+    },
+    body: formData,
+  });
+
+  const json = await response.json();
+
+  if (!response.ok) {
+    throw new Error(json?.message ?? "Failed to analyze image");
+  }
+
+  return json.data;
+}
