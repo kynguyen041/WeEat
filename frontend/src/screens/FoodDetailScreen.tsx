@@ -1,6 +1,7 @@
 import { getFood } from "@/api/foodAPI";
 import { Food } from "@/api/types";
-import { useLocalSearchParams } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -10,13 +11,15 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
+import { useCart } from "../context/CartContext";
 import styles from "../styles/FoodDetailScreen.styles";
 
 export default function FoodDetailScreen() {
   const { id } = useLocalSearchParams();
 
   const [food, setFood] = useState<Food | null>(null);
+
+  const { addToCart } = useCart();
 
   useEffect(() => {
     async function loadFood() {
@@ -36,33 +39,40 @@ export default function FoodDetailScreen() {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <Image
-        source={{ uri: food.imageCover }}
-        style={styles.image}
-        resizeMode="cover"
-      />
+    <View style={styles.screen}>
+      {/* Back Button */}
+      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <Ionicons name="arrow-back" size={28} color="#222" />
+      </TouchableOpacity>
 
-      <View style={styles.content}>
-        <Text style={styles.name}>{food.name}</Text>
+      <ScrollView style={styles.container}>
+        <Image
+          source={{ uri: food.imageCover }}
+          style={styles.image}
+          resizeMode="cover"
+        />
 
-        <Text style={styles.rating}>⭐ {food.ratingsAverage}</Text>
+        <View style={styles.content}>
+          <Text style={styles.name}>{food.name}</Text>
 
-        <Text style={styles.orders}>{food.totalOrders} Orders</Text>
+          <Text style={styles.rating}>⭐ {food.ratingsAverage}</Text>
 
-        <Text style={styles.descriptionTitle}>Description</Text>
+          <Text style={styles.orders}>{food.totalOrders} Orders</Text>
 
-        <Text style={styles.description}>{food.description}</Text>
+          <Text style={styles.descriptionTitle}>Description</Text>
 
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => {
-            console.log("Add to Cart:", food.name);
-          }}
-        >
-          <Text style={styles.addButtonText}>Add to Cart</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+          <Text style={styles.description}>{food.description}</Text>
+
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => {
+              addToCart(food);
+            }}
+          >
+            <Text style={styles.addButtonText}>Add to Cart</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </View>
   );
 }
